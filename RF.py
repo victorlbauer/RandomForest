@@ -52,7 +52,7 @@ class RandomForest():
 		
 if __name__ == "__main__":
 	rf = RandomForest("balloons.data.txt")
-	#rf.shuffle()
+	rf.shuffle()
 	#rf.setTrainingAndTesting(0.8) #80% treino, 10% teste
 	rf.setTrainingAndTesting(1.0) #100% do dataset para treino, 0% teste
 	
