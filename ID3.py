@@ -85,7 +85,8 @@ class ID3():
 		if(type(tree) is np.ndarray):
 			return tree[0]
 		else:
+			prediction = '?'
 			for att in example:
 				if(att in tree.keys()):
-					prediction = self.predict(tree[att], example)
+					prediction = self.predict(tree[att], example)							 		
 		return prediction
