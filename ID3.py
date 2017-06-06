@@ -56,14 +56,23 @@ class ID3():
 		
 		gain = np.array([self.gain(label_set, att) for att in att_set])
 		best_att_index = np.argmax(gain)
-	
-		sets = self.createDictionary(att_set[best_att_index])
+		
+		#se o ganho nao for significativo, pare
+		if np.all(gain < 1e-6):
+        		return label_set
+		
+		if(att_set.ndim == 1):
+			best_att_index = 0
+			att_set = np.array([att_set[best_att_index]])
+			sets = self.createDictionary(att_set)
+		else:
+			sets = self.createDictionary(att_set[best_att_index])
 		
 		tree = {}
 		for att, index in sets.items():
 			label_subset = label_set.take(index, axis=0)
 			att_subset = att_set.T.take(index, axis=0)
-			tree[att, best_att_index] = self.generateTree(att_subset.T, label_subset)
+			tree[att] = self.generateTree(att_subset.T, label_subset)
 		return tree
 
 	def printTree(self, tree, itt):
@@ -71,15 +80,15 @@ class ID3():
 			print (itt*"\t") + tree[0]
 		else:	
 			for node in tree.keys():
-				print (itt*"\t"), node
+				print (itt*"\t") + '[', node, ']'
 				next_itt = itt + 1
 				self.printTree(tree[node], next_itt)
-
+					
 	def predict(self, tree, example):
 		if(type(tree) is np.ndarray):
-			print "Classe = ", tree[0]
+			return tree[0]
 		else:
-			for att, index in tree.keys():
-				if(att == example[index]):
-					self.predict(tree[att, index], example)
-			
+			for att in example:
+				if(att in tree.keys()):
+					prediction = self.predict(tree[att], example)
+		return prediction

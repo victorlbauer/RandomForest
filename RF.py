@@ -3,11 +3,20 @@ import math
 from ID3 import *
 
 class RandomForest():
-	def __init__(self, path):
+	def __init__(self, path, p_training, p_examples, p_att, n_trees):
 		self.path = path
+		self.p_training = p_training
+		self.p_examples = p_examples
+		self.p_att = p_att
+		self.n_trees = n_trees
+		
 		self.num_att = self.getNumAtt()
 		self.dataset = self.loadDataset(path)
 		self.ID3 = ID3()
+		
+		self.shuffle()
+		self.setTrainingAndTesting()
+
 		
 	def getNumAtt(self):
 		arq = open(self.path, 'r')
@@ -31,37 +40,64 @@ class RandomForest():
 		return dataset
 	
 	#(P%) para treino, (1 - P)% para teste
-	def setTrainingAndTesting(self, P):
-		self.training_set = self.dataset[:int(math.ceil(self.num_examples*P))]
-		self.testing_set = self.dataset[int(math.ceil(self.num_examples*P)):]
+	def setTrainingAndTesting(self):
+		self.training_set = self.dataset[:int(math.ceil(self.num_examples*self.p_training))]
+		self.testing_set = self.dataset[int(math.ceil(self.num_examples*self.p_training)):]
 
-	def getTrainingSet(self):
-		return self.training_set
+	def getTestSet(self):
+		return self.testing_set
 	
+	def permute(self, dataset):
+		return np.random.permutation(dataset)
+			
 	def shuffle(self):
 		np.random.shuffle(self.dataset)
-		
-	#TODO: terminar a random forest. O ID3 esta pronto, ele retorna (printa e classifica, se quiser)	um dataset qualquer
-	#Contudo, com o RandomForest temos que repetir esse processo N vezes para o mesmo dataset
 	
+	def getBatch(self, dataset, P):
+		return dataset[:int(math.ceil(len(dataset)*P))]
+	
+	def splitClass(self, dataset):
+		return dataset[:-1], dataset[-1] 
+			
 	def train(self):
-		pass
+		trees_list = []
+		for _ in xrange(0, self.n_trees):
+			ts = self.permute(self.training_set)
+			batch = self.getBatch(ts, self.p_examples)
 		
-	def predict(self):
-		pass
+			sample_att, classes = self.splitClass(batch.T)
+			sample_att = self.permute(sample_att)
+			subsample = self.getBatch(sample_att, self.p_att)
 		
+			for att in subsample:
+				classes = np.vstack((classes, att))
+			dataset = np.fliplr(classes.T)
+			
+			tree = rf.ID3.train(dataset)
+			trees_list.append(tree)
+		self.trees_list = trees_list				
+	
+	def vote(self, class_dic):
+		total = 0
+		for entry in class_dic.keys():
+			if(class_dic[entry] > total):
+				total, pred = class_dic[entry], entry
+		return pred
+					
+	def predict(self, example):
+		class_dic = {}
+		for tree in self.trees_list:
+			prediction = rf.ID3.predict(tree, example)
+			if(prediction not in class_dic.keys()):
+				class_dic[prediction] = 1
+			else:
+				class_dic[prediction] += 1
+		pred = self.vote(class_dic)
+		print pred
+					
 if __name__ == "__main__":
-	rf = RandomForest("balloons.data.txt")
-	rf.shuffle()
-	#rf.setTrainingAndTesting(0.8) #80% treino, 10% teste
-	rf.setTrainingAndTesting(1.0) #100% do dataset para treino, 0% teste
-	
-	training_set = rf.getTrainingSet()
-	print training_set
-	print
-	tree = rf.ID3.train(training_set)
-	rf.ID3.printTree(tree, 0)
-	
-	example = np.array(["YELLOW", "LARGE", "STRETCH", "ADULT"])
-	rf.ID3.predict(tree, example)
-
+	rf = RandomForest("balloons.data.txt", 0.8, 0.5, 0.5, 21)
+	rf.train()
+	test_set = rf.getTestSet()
+	for example in test_set:
+		rf.predict(example)
