@@ -54,3 +54,7 @@ class RandomForest():
 				class_dic[prediction] += 1
 		pred = self.vote(class_dic)
 		return pred
+		
+	def printList(self):
+		for tree in self.trees_list:
+			self.ID3.printTree(tree, 0)	
