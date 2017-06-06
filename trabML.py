@@ -57,7 +57,7 @@ if __name__ == "__main__":
 	training_set, testing_set = setTrainingAndTesting(dataset, num_examples, 0.8)
 	
 	#RandomForest(dataset, [porcento do dataset treino para ser dividido], [porcento dos atributos a serem divididos], [numero de arvores])
-	rf = RandomForest(training_set, 0.6, 0.6, 3)
+	rf = RandomForest(training_set, 0.6, 0.6, 15)
 	rf.train()
 	
 	decision_tree = ID3()
