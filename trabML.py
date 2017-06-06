@@ -46,4 +46,8 @@ if __name__ == "__main__":
 	decision_tree = ID3()
 	tree = decision_tree.train(training_set)
 	
-	
+	for example in testing_set:
+		rf_p = rf.predict(example)
+		dt_p = decision_tree.predict(tree, example)
+		print "RF pred = " + rf_p,
+		print "ID3 pred = " + dt_p

@@ -2,9 +2,6 @@ import numpy as np
 import math
 
 class ID3():
-	def __init__(self):
-		pass
-	
 	#Treina a arvore de decisao pelo ID3
 	def train(self, dataset):
 		tree = self.generateTree(dataset.T[:-1], dataset.T[-1])

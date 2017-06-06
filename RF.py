@@ -53,4 +53,4 @@ class RandomForest():
 			else:
 				class_dic[prediction] += 1
 		pred = self.vote(class_dic)
-		print pred
+		return pred
