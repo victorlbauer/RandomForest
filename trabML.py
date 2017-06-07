@@ -51,30 +51,22 @@ def accuracy(path):
 	print "ID3 acc: ", float(decision_tree_acc/i)
 	
 if __name__ == "__main__":
-	#Por enquanto ta essa gambiarra para rodar, depois posso modificar para ser automatico, mas temos pouco tempo
-	#Mudar o nome do arquivo caso queira usar outro dataset. Ex: "balloons.data.txt" -> "cars.data.txt"
-	dataset, num_examples = loadDataset("car.data.txt")
+	datapath = "car.data.txt"
+	accpath = "car_acc.txt"
+	
+	dataset, num_examples = loadDataset(datapath)
 	training_set, testing_set = setTrainingAndTesting(dataset, num_examples, 0.8)
 	
 	#RandomForest(dataset, [porcento do dataset treino para ser dividido], [porcento dos atributos a serem divididos], [numero de arvores])
-	rf = RandomForest(training_set, 0.6, 0.6, 15)
-#	rf.train()
+	rf = RandomForest(training_set, 0.4, 0.4, 15)
+	rf.train()
 	
 	decision_tree = ID3()
 	tree = decision_tree.train(training_set)
 	
-	for example in testing_set:
-		print decision_tree.predict(tree, example)
-	
-	#Treinar primeiro, depois descomente o codigo abaixo para testar a accuracia dos algoritmos
-	#Mudar o nome para a accuracia do dataset. Ex: "balloons_acc.txt" -> "cars_acc.txt"
-	#accuracy('car_acc.txt')
-
-#Descomente os (') para treinar, verifique se o nome dos arquivos esta de acordo com os anteriores
-	
 	test_len = len(testing_set)
 	i = 1
-	arq = open("car_acc.txt", "w") #Mudar o nome para o arquivo certo
+	arq = open(accpath, "w")
 	for example in testing_set:
 		print "itt: ", i, "/", test_len
 		true_value = example[-1].replace('\n', '')
@@ -86,5 +78,5 @@ if __name__ == "__main__":
 		arq.write("%s\n" % true_value)
 		i += 1
 	arq.close()
-#'''
+	accuracy(accpath)
 
