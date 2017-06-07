@@ -88,5 +88,6 @@ class ID3():
 			prediction = '?'
 			for att in example:
 				if(att in tree.keys()):
-					prediction = self.predict(tree[att], example)							 		
+					prediction = self.predict(tree[att], example)
+					break							 		
 		return prediction
